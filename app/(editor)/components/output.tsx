@@ -1,50 +1,97 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Terminal } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { CheckCircle2, Copy, Terminal, XCircle } from "lucide-react";
+import { toast } from "sonner";
 
 export function Output({
   output,
-  clear,
   stderr,
   textInput,
   setTextInput,
+  hasRun,
 }: {
-  output: string[] | null;
-  clear: () => void;
+  output: string[];
   stderr?: boolean;
   textInput: string;
   setTextInput: (value: string) => void;
+  hasRun: boolean;
 }) {
-  return (
-    <div className="w-full overflow-hidden scrollbar-hidden h-[88vh]">
-      <div className="h-12 border-b border-border flex items-center px-4 justify-between">
-        <div className="flex items-center gap-2">
-          <Terminal />
-          <h2>Output</h2>
-        </div>
+  const copyOutput = async () => {
+    const text = output.join("\n").trim();
+    if (!text) {
+      toast("Nothing to copy yet");
+      return;
+    }
+    await navigator.clipboard.writeText(text);
+    toast("Output copied to clipboard");
+  };
 
-        <Button size="sm" variant="outline" onClick={clear}>
-          Clear
-        </Button>
-      </div>
-      <div className="h-[calc(100vh-96px)] overflow-auto">
-        <div className="m-4">
+  return (
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center gap-2">
+          <Terminal className="size-4 text-muted-foreground" />
           <div>
-            <Textarea value={textInput} onChange={(e) => setTextInput(e.target.value)} />
-            <div className="border border-border rounded-md mt-4 w-full h-[400px] overflow-y-scroll">
-              <div className="w-full h-full p-4">
-                {output &&
-                  output.map((line: string, i: number) => (
-                    <p key={i} className={`${stderr ? "text-red-500" : "text-green-500"}`}>
-                      {line}
-                    </p>
-                  ))}
-              </div>
-            </div>
+            <h2 className="text-sm font-semibold leading-none">Output</h2>
           </div>
         </div>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={copyOutput}
+          className="h-8 gap-1.5 text-muted-foreground hover:text-foreground"
+        >
+          <Copy className="size-3.5" />
+          Copy
+        </Button>
       </div>
+
+      <div className="min-h-0 flex-1 overflow-auto px-4 pb-4">
+        {!hasRun ? (
+          <p className="pt-8 text-center text-sm text-muted-foreground">
+            Run your code to see the output here...
+          </p>
+        ) : (
+          <div className="rounded-xl border border-border/70 bg-background/40 p-4">
+            <div className="mb-3 flex items-center gap-2 text-sm font-medium">
+              {stderr ? (
+                <>
+                  <XCircle className="size-4 text-red-400" />
+                  <span className="text-red-400">Execution Failed</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="size-4 text-emerald-400" />
+                  <span className="text-emerald-400">Execution Successful</span>
+                </>
+              )}
+            </div>
+            <pre
+              className={cn(
+                "font-mono text-[13px] leading-6 whitespace-pre-wrap",
+                stderr ? "text-red-300" : "text-foreground/80"
+              )}
+            >
+              {output.filter(Boolean).join("\n") || "Program finished with no output."}
+            </pre>
+          </div>
+        )}
+      </div>
+
+      <details className="border-t border-border/70 px-4 py-3">
+        <summary className="cursor-pointer text-xs font-medium text-muted-foreground hover:text-foreground">
+          Standard input
+        </summary>
+        <Textarea
+          value={textInput}
+          onChange={(event) => setTextInput(event.target.value)}
+          placeholder="Optional program input"
+          className="mt-3 min-h-16 resize-none rounded-xl border-border/80 bg-background/50"
+        />
+      </details>
     </div>
   );
 }

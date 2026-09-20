@@ -1,32 +1,84 @@
-export const LANGUAGE_VERSIONS = {
-  javascript: "18.15.0",
-  typescript: "5.0.3",
-  python: "3.10.0",
-  java: "15.0.2",
-  csharp: "6.12.0",
-  php: "8.2.3",
-  dart: "2.19.6",
-  haskell: "9.0.1",
-  prolog: "8.2.4",
-  rust: "1.68.2",
-  bash: "5.2.0",
-  sqlite3: "3.36.0",
-  c: "10.2.0",
-};
+export const LANGUAGES = [
+  { id: "javascript", label: "JavaScript", monaco: "javascript", version: "18.15.0", short: "JS" },
+  { id: "typescript", label: "TypeScript", monaco: "typescript", version: "5.0.3", short: "TS" },
+  { id: "python", label: "Python", monaco: "python", version: "3.10.0", short: "PY" },
+  { id: "java", label: "Java", monaco: "java", version: "15.0.2", short: "JA" },
+  { id: "go", label: "Go", monaco: "go", version: "1.16.2", short: "GO" },
+  { id: "csharp", label: "C#", monaco: "csharp", version: "6.12.0", short: "C#" },
+  { id: "php", label: "PHP", monaco: "php", version: "8.2.3", short: "PHP" },
+  { id: "dart", label: "Dart", monaco: "dart", version: "2.19.6", short: "DT" },
+  { id: "haskell", label: "Haskell", monaco: "haskell", version: "9.0.1", short: "HS" },
+  { id: "prolog", label: "Prolog", monaco: "plaintext", version: "8.2.4", short: "PL" },
+  { id: "rust", label: "Rust", monaco: "rust", version: "1.68.2", short: "RS" },
+  { id: "bash", label: "Bash", monaco: "shell", version: "5.2.0", short: "SH" },
+  { id: "sqlite3", label: "SQLite", monaco: "sql", version: "3.36.0", short: "SQL" },
+  { id: "c", label: "C", monaco: "c", version: "10.2.0", short: "C" },
+] as const;
 
-export const CODE_SNIPPETS: { [key: string]: string } = {
-  javascript: `\nfunction greet(name) {\n\tconsole.log("Hello, " + name + "!");\n}\n\ngreet("Alex");\n`,
-  typescript: `\ntype Params = {\n\tname: string;\n}\n\nfunction greet(data: Params) {\n\tconsole.log("Hello, " + data.name + "!");\n}\n\ngreet({ name: "Alex" });\n`,
-  python: `\ndef greet(name):\n\tprint("Hello, " + name + "!")\n\ngreet("Alex")\n`,
-  java: `\npublic class HelloWorld {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello World");\n\t}\n}\n`,
-  csharp:
-    'using System;\n\nnamespace HelloWorld\n{\n\tclass Hello { \n\t\tstatic void Main(string[] args) {\n\t\t\tConsole.WriteLine("Hello World in C#");\n\t\t}\n\t}\n}\n',
-  php: "<?php\n\n$name = 'Alex';\necho $name;\n",
-  dart: `\nvoid main() {\n\tprint('Hello, World!');\n}\n`,
-  haskell: `\nmain = putStrLn "Hello, World!"\n`,
-  prolog: `:- use_module(library(clpfd)).\n\nmain :-\n\twrite('Hello, World!'), nl.\n`,
-  rust: `\nfn main() {\n\tprintln!("Hello, World!");\n}\n`,
-  bash: "#!/bin/bash\necho 'Hello, World!'\n",
-  sqlite3: `CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT); INSERT INTO users (name) VALUES ('Birusha'); SELECT * FROM users;`,
-  c: `#include <stdio.h>\n\nint main() {\n\tprintf("Hello, World!");\n\treturn 0;\n}`,
+export type LanguageId = (typeof LANGUAGES)[number]["id"];
+
+export const LANGUAGE_VERSIONS = Object.fromEntries(
+  LANGUAGES.map((language) => [language.id, language.version])
+) as Record<LanguageId, string>;
+
+export function getLanguage(id: string) {
+  return LANGUAGES.find((language) => language.id === id) ?? LANGUAGES[0];
+}
+
+export const CODE_SNIPPETS: Record<string, string> = {
+  javascript: `console.log("Hello, World!");
+`,
+  typescript: `console.log("Hello, World!");
+`,
+  python: `print("Hello, World!")
+`,
+  java: `public class HelloWorld {
+	public static void main(String[] args) {
+		System.out.println("Hello, World!");
+	}
+}
+`,
+  go: `package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("Hello, World!")
+}
+`,
+  csharp: `using System;
+
+class HelloWorld {
+	static void Main() {
+		Console.WriteLine("Hello, World!");
+	}
+}
+`,
+  php: `<?php
+echo "Hello, World!";
+`,
+  dart: `void main() {
+	print("Hello, World!");
+}
+`,
+  haskell: `main = putStrLn "Hello, World!"
+`,
+  prolog: `main :-
+	write('Hello, World!'), nl.
+`,
+  rust: `fn main() {
+	println!("Hello, World!");
+}
+`,
+  bash: `echo "Hello, World!"
+`,
+  sqlite3: `SELECT "Hello, World!";
+`,
+  c: `#include <stdio.h>
+
+int main() {
+	printf("Hello, World!");
+	return 0;
+}
+`,
 };
