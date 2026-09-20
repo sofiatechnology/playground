@@ -15,7 +15,7 @@ function ThemeSwitch() {
     setMounted(true);
   }, []);
 
-  const isDark = !mounted || resolvedTheme !== "light";
+  const isDark = mounted ? resolvedTheme !== "light" : false;
 
   return (
     <button
